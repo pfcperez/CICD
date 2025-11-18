@@ -7,7 +7,7 @@ WORKDIR /webapp
 # 3. Copiar PRIMERO las dependencias
 # (El "." significa "copia al WORKDIR actual, /webapp")
 COPY ./requirements.txt .
-COPY roberta-sequence-classification-9.onnx /webapp
+RUN wget https://huggingface.co/onnxmodelzoo/roberta-sequence-classification-9/resolve/main/roberta-sequence-classification-9.onnx -O roberta-sequence-classification-9.onnx
 
 # 4. Instalar las dependencias (con optimizaciones)
 #    - Actualizamos pip

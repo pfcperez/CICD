@@ -7,7 +7,6 @@ WORKDIR /webapp
 # 3. Copiar PRIMERO las dependencias
 # (El "." significa "copia al WORKDIR actual, /webapp")
 COPY ./requirements.txt .
-RUN wget https://huggingface.co/onnxmodelzoo/roberta-sequence-classification-9/resolve/main/roberta-sequence-classification-9.onnx -O roberta-sequence-classification-9.onnx
 
 # 4. Instalar las dependencias (con optimizaciones)
 #    - Actualizamos pip
@@ -15,6 +14,8 @@ RUN wget https://huggingface.co/onnxmodelzoo/roberta-sequence-classification-9/r
 #    ¡ADVERTENCIA: Este paso tardará MUCHO por culpa de PyTorch!
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
+RUN apt-get update && apt-get install -y wget --no-install-recommends && rm -rf /var/lib/apt/lists/*
+RUN wget https://huggingface.co/onnxmodelzoo/roberta-sequence-classification-9/resolve/main/roberta-sequence-classification-9.onnx -O roberta-sequence-classification-9.onnx
 
 # 5. Copiar el resto del código de la aplicación
 #    (Asume que tu app.py está en una carpeta local 'webapp')

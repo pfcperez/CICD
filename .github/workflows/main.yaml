@@ -1,0 +1,46 @@
+name: Build and Push to AWS ECR
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+env:
+  AWS_REGION: us-east-1                   # Cambia esto si usas otra región (ej. us-east-2)
+  ECR_REPOSITORY: mlops-chapter4          # ¡PON AQUÍ EL NOMBRE QUE CREASTE EN EL PASO 1!
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    
+    steps:
+    # 1. Bajar tu código del repositorio
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # 2. Configurar las llaves de AWS (Las que guardaste en Secrets)
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    # 3. Iniciar sesión en ECR (para tener permiso de subir)
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    # 4. Construir, etiquetar y subir la imagen a ECR
+    - name: Build, tag, and push image to Amazon ECR
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: latest # O puedes usar ${{ github.sha }} para versiones únicas
+      run: |
+        # Construir la imagen usando tu Dockerfile
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        
+        # Subir la imagen a AWS
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        
+        echo "::notice::Imagen subida exitosamente a: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"

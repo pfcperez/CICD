@@ -1,0 +1,10 @@
+# --- Deep Learning (Modern versions) ---
+torch
+transformers
+simpletransformers
+tensorboardX
+onnxruntime
+
+# --- Web Server (Modern versions) ---
+flask
+gunicorn
